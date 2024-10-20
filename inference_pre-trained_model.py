@@ -1,4 +1,5 @@
-from transformers import LlamaForCausalLM, AutoTokenizer
+from transformers import LlamaTokenizer, LlamaForCausalLM, AutoModelForCausalLM, Trainer, TrainingArguments, AutoTokenizer
+import pandas as pd
 import torch
 
 if __name__ == "__main__" :
@@ -9,47 +10,25 @@ if __name__ == "__main__" :
         device = torch.device("cpu")
         print("Using CPU")
 
-    input_text = 'Please change the pro c code below into java code.\
-    #include <stdio.h> \
-    int main() { \
-        int rows = 5; \
-        int cols = 5; \
-        int array[5][5]; \
-        // 이중 for문을 사용하여 배열 초기화 \
-        for (int i = 0; i < rows; i++) { \
-            for (int j = 0; j < cols; j++) { \
-                array[i][j] = i * j;  // 배열의 값을 행과 열의 곱으로 설정 \
-            } \
-        } \
-        // 이중 for문을 사용하여 배열 출력 \
-        for (int i = 0; i < rows; i++) { \
-            for (int j = 0; j < cols; j++) { \
-                printf("%d ", array[i][j]); \
-            } \
-            printf("\n"); \
-        } \
-        return 0; \
-    } \
-    '
+    input_text = 'What is the Kubernetes configuration for a simple apache web server?'
 
     print(input_text)
 
 
-    use_model_name = "llama-3.2-3b"
-    
+    use_model_name = "llama-3.2-3b-instruct"
+
     # token_path 경로 수정 필요
     token_path = "D:/py_workspace/llama_finetuning/model/{}/original".format(use_model_name)
 
     # model_path 경로 수정 필요
     model_path = "D:/py_workspace/llama_finetuning/model/{}".format(use_model_name)
 
-    # token_path = "/home/quickpass-sd/llama-nw/result/tokenizer_20241020_223303"
-    # model_path = "/home/quickpass-sd/llama-nw/result/fine_tuned_20241020_223303"
 
     tokenizer = AutoTokenizer.from_pretrained(token_path, legacy=False)
     tokenizer.pad_token = tokenizer.eos_token
 
-    model = LlamaForCausalLM.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model.eval()  # 추론 모드로 설정 (필수)
     model.to(device)
 
 
